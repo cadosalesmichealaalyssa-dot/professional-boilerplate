@@ -8,12 +8,14 @@ import {
     paginationQuerySchema 
 } from '../dto/user.dto';
 import { asyncHandler } from '../utils/asyncHandler';
+import { authMiddleware } from '../middleware/auth';
 
 export const userRoutes = Router();
 
 // GET /api/users - List all users (paginated)
 userRoutes.get(
     '/',
+    authMiddleware,
     validate(paginationQuerySchema, 'query'),
     asyncHandler(UserController.getAll)
 );
@@ -21,6 +23,7 @@ userRoutes.get(
 // GET /api/users/:id - Get user by ID
 userRoutes.get(
     '/:id',
+    authMiddleware,
     validate(idParamSchema, 'params'),
     asyncHandler(UserController.getById)
 );
@@ -35,6 +38,7 @@ userRoutes.post(
 // PUT /api/users/:id - Update user
 userRoutes.put(
     '/:id',
+    authMiddleware,
     validate(idParamSchema, 'params'),
     validate(updateUserSchema),
     asyncHandler(UserController.update)
@@ -43,6 +47,7 @@ userRoutes.put(
 // DELETE /api/users/:id - Delete user
 userRoutes.delete(
     '/:id',
+    authMiddleware,
     validate(idParamSchema, 'params'),
     asyncHandler(UserController.delete)
 );

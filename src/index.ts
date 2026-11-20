@@ -16,6 +16,7 @@ import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 // Routes
 import { userRoutes } from './routes/userRoutes';
 import { healthRoutes } from './routes/healthRoutes';
+import { authRoutes } from './routes/authRoutes';
 
 const app = express();
 
@@ -43,6 +44,7 @@ app.use(requestLoggingMiddleware);
 // === ROUTES ===
 
 app.use('/health', healthRoutes);
+app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 
 // === ERROR HANDLING (must be last) ===
