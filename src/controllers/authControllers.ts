@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { AuthService } from '../services/authService';
+import { VerificationService } from '../services/verificationService';
 import { UnauthorizedError } from '../utils/errors';
 import { sendSuccess } from '../utils/response';
 import { createLogger } from '../utils/logger';
@@ -7,31 +8,49 @@ import { createLogger } from '../utils/logger';
 const logger = createLogger('AuthController');
 
 export class AuthController {
-   /**
-    * POST /api/auth/login
-    */
-   static async login(req: Request, res: Response) {
-       const { email, password } = req.body;
+  /**
+   * POST /api/auth/forgot-password
+   */
+  static async forgotPassword(req: Request, res: Response) {
+    const { email } = req.body;
+    const result = await VerificationService.forgotPassword(email);
+    sendSuccess(res, result, result.message);
+  }
 
-       const authResponse = await AuthService.login({ email, password });
+  /**
+   * POST /api/auth/reset-password
+   */
+  static async resetPassword(req: Request, res: Response) {
+    const { token, newPassword } = req.body;
+    const result = await VerificationService.resetPassword(token, newPassword);
+    sendSuccess(res, result, result.message);
+  }
 
-       logger.info('Login successful', { userId: authResponse.user.id });
-       sendSuccess(res, authResponse, 'Login successful');
-   }
+  /**
+   * POST /api/auth/login
+   */
+  static async login(req: Request, res: Response) {
+    const { email, password } = req.body;
 
-   /**
-    * GET /api/auth/me - Get current user from token
-    */
-   static async getMe(req: Request, res: Response) {
-       const authHeader = req.headers.authorization;
+    const authResponse = await AuthService.login({ email, password });
 
-       if (!authHeader || !authHeader.startsWith('Bearer ')) {
-           throw new UnauthorizedError('No token provided');
-       }
+    logger.info('Login successful', { userId: authResponse.user.id });
+    sendSuccess(res, authResponse, 'Login successful');
+  }
 
-       const token = authHeader.split(' ')[1];
-       const user = await AuthService.getUserFromToken(token);
+  /**
+   * GET /api/auth/me - Get current user from token
+   */
+  static async getMe(req: Request, res: Response) {
+    const authHeader = req.headers.authorization;
 
-       sendSuccess(res, user);
-   }
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      throw new UnauthorizedError('No token provided');
+    }
+
+    const token = authHeader.split(' ')[1];
+    const user = await AuthService.getUserFromToken(token);
+
+    sendSuccess(res, user);
+  }
 }

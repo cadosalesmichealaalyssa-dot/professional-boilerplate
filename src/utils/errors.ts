@@ -60,3 +60,8 @@ export class InternalError extends AppError {
         super(message, 500, 'INTERNAL_ERROR', false);
     }
 }
+export class BadRequestError extends AppError {
+  constructor(message: string = 'Bad request') {
+    super(message, 400, 'BAD_REQUEST');
+  }
+}
